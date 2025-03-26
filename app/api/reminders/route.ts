@@ -48,7 +48,7 @@ async function handleCreateReminder(reminderData: any, phoneNumber: string) {
     const response = await smsService.send({
       to: [phoneNumber],
       message,
-      from: "UJAMAA",
+      from: "20880",
     })
 
     return NextResponse.json({
@@ -74,7 +74,7 @@ async function handleUpdateReminder(reminderData: any, phoneNumber: string) {
     const response = await smsService.send({
       to: [phoneNumber],
       message,
-      from: "UJAMAA",
+      from: "20880",
     })
 
     return NextResponse.json({
@@ -100,7 +100,7 @@ async function handleDeleteReminder(reminderId: string, phoneNumber: string) {
     const response = await smsService.send({
       to: [phoneNumber],
       message,
-      from: "UJAMAA",
+      from: "20880",
     })
 
     return NextResponse.json({
@@ -148,4 +148,3 @@ async function handleListReminders(phoneNumber: string) {
     return NextResponse.json({ success: false, message: "Failed to list reminders" }, { status: 500 })
   }
 }
-

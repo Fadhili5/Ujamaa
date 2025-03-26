@@ -1,3 +1,6 @@
+"use client"
+import { useState, useEffect } from "react"
+import { useForm } from "react-hook-form"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -5,6 +8,67 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { PhoneCall, Users, MessageSquare, Shield } from "lucide-react"
 
 export default function MentalHealthPage() {
+  const { register, handleSubmit, reset } = useForm()
+  const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState("")
+  const [currentGroup, setCurrentGroup] = useState(null)
+  const [chatMessages, setChatMessages] = useState([])
+
+  const onJoinGroup = async (data: any) => {
+    setLoading(true)
+    setMessage("")
+    try {
+      const response = await fetch("/api/join-group", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      })
+      const result = await response.json()
+      if (result.success) {
+        setMessage("Joined group successfully!")
+        setCurrentGroup(data.group)
+        reset()
+      } else {
+        setMessage("Failed to join group.")
+      }
+    } catch (error) {
+      setMessage("An error occurred.")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const onSendMessage = async (data: any) => {
+    setLoading(true)
+    setMessage("")
+    try {
+      const response = await fetch("/api/send-message", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ...data, group: currentGroup }),
+      })
+      const result = await response.json()
+      if (result.success) {
+        setChatMessages([...chatMessages, { message: data.message, sender: "You" }])
+        reset()
+      } else {
+        setMessage("Failed to send message.")
+      }
+    } catch (error) {
+      setMessage("An error occurred.")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    console.log('Component mounted')
+  }, [])
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900">
       <header className="bg-white dark:bg-gray-950 shadow-md">
@@ -19,31 +83,19 @@ export default function MentalHealthPage() {
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Ujamaa Mental Health</h1>
             </div>
             <nav className="hidden md:flex space-x-6">
-              <Link
-                href="/"
-                className="text-gray-700 dark:text-gray-200 hover:text-purple-600 dark:hover:text-purple-400"
-              >
+              <Link href="/" className="text-gray-700 dark:text-gray-200 hover:text-purple-600 dark:hover:text-purple-400">
                 Home
               </Link>
-              <Link
-                href="/health"
-                className="text-gray-700 dark:text-gray-200 hover:text-purple-600 dark:hover:text-purple-400"
-              >
+              <Link href="/health" className="text-gray-700 dark:text-gray-200 hover:text-purple-600 dark:hover:text-purple-400">
                 Health
               </Link>
               <Link href="/mental-health" className="text-purple-600 dark:text-purple-400 font-medium">
                 Mental Health
               </Link>
-              <Link
-                href="/resources"
-                className="text-gray-700 dark:text-gray-200 hover:text-purple-600 dark:hover:text-purple-400"
-              >
+              <Link href="/resources" className="text-gray-700 dark:text-gray-200 hover:text-purple-600 dark:hover:text-purple-400">
                 Resources
               </Link>
-              <Link
-                href="/emergency"
-                className="text-gray-700 dark:text-gray-200 hover:text-purple-600 dark:hover:text-purple-400"
-              >
+              <Link href="/emergency" className="text-gray-700 dark:text-gray-200 hover:text-purple-600 dark:hover:text-purple-400">
                 Emergency
               </Link>
             </nav>
@@ -193,55 +245,50 @@ export default function MentalHealthPage() {
                     </div>
 
                     <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                      <h4 className="font-medium mb-2">SMS Commands</h4>
-                      <ul className="space-y-2 text-sm">
-                        <li>
-                          <span className="font-mono bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">GROUP LIST</span> -
-                          View all available groups
-                        </li>
-                        <li>
-                          <span className="font-mono bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
-                            JOIN [GROUP NAME]
-                          </span>{" "}
-                          - Subscribe to a group
-                        </li>
-                        <li>
-                          <span className="font-mono bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
-                            LEAVE [GROUP NAME]
-                          </span>{" "}
-                          - Unsubscribe from a group
-                        </li>
-                        <li>
-                          <span className="font-mono bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">MEETINGS</span> -
-                          View upcoming meetings
-                        </li>
-                        <li>
-                          <span className="font-mono bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
-                            REMIND [MEETING ID]
-                          </span>{" "}
-                          - Set reminder for a meeting
-                        </li>
-                      </ul>
+                      <h4 className="font-medium mb-2">Join a Group</h4>
+                      <form onSubmit={handleSubmit(onJoinGroup)} className="space-y-4">
+                        <select
+                          {...register("group", { required: true })}
+                          className="w-full p-2 border border-gray-300 rounded"
+                        >
+                          <option value="">Select a group</option>
+                          <option value="Anxiety Support">Anxiety Support</option>
+                          <option value="Depression Support">Depression Support</option>
+                          <option value="Grief & Loss">Grief & Loss</option>
+                          <option value="Trauma Survivors">Trauma Survivors</option>
+                          <option value="Youth Mental Health">Youth Mental Health</option>
+                          <option value="Family Support">Family Support</option>
+                        </select>
+                        <Button type="submit" className="w-full sm:w-auto" disabled={loading}>
+                          {loading ? "Joining..." : "Join Group"}
+                        </Button>
+                      </form>
+                      {message && <p className="text-center mt-4">{message}</p>}
                     </div>
                   </div>
 
-                  <div className="bg-green-50 dark:bg-green-900/30 p-4 rounded-lg">
-                    <h4 className="font-medium mb-2">Meeting Formats</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
-                      <div className="bg-white dark:bg-gray-800 p-3 rounded">
-                        <h5 className="font-medium mb-1">In-Person</h5>
-                        <p>Face-to-face meetings at community centers and health facilities</p>
+                  {currentGroup && (
+                    <div className="bg-green-50 dark:bg-green-900/30 p-4 rounded-lg">
+                      <h4 className="font-medium mb-2">Group Chat - {currentGroup}</h4>
+                      <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 mb-4 h-64 overflow-y-auto">
+                        {chatMessages.map((msg, index) => (
+                          <div key={index} className="mb-2">
+                            <strong>{msg.sender}:</strong> {msg.message}
+                          </div>
+                        ))}
                       </div>
-                      <div className="bg-white dark:bg-gray-800 p-3 rounded">
-                        <h5 className="font-medium mb-1">Voice Conference</h5>
-                        <p>Join via phone call with a provided access code</p>
-                      </div>
-                      <div className="bg-white dark:bg-gray-800 p-3 rounded">
-                        <h5 className="font-medium mb-1">SMS Group Chat</h5>
-                        <p>Text-based group discussions via SMS</p>
-                      </div>
+                      <form onSubmit={handleSubmit(onSendMessage)} className="space-y-4">
+                        <textarea
+                          {...register("message", { required: true })}
+                          placeholder="Type your message..."
+                          className="w-full p-2 border border-gray-300 rounded"
+                        />
+                        <Button type="submit" className="w-full sm:w-auto" disabled={loading}>
+                          {loading ? "Sending..." : "Send Message"}
+                        </Button>
+                      </form>
                     </div>
-                  </div>
+                  )}
                 </div>
               </CardContent>
               <CardFooter className="flex justify-center">
@@ -340,4 +387,3 @@ export default function MentalHealthPage() {
     </div>
   )
 }
-

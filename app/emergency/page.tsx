@@ -1,3 +1,6 @@
+"use client"
+import { useState } from "react"
+import { useForm } from "react-hook-form"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -5,6 +8,85 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Bell, AlertTriangle, Users } from "lucide-react"
 
 export default function EmergencyPage() {
+  const { register, handleSubmit, reset } = useForm()
+  const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState("")
+
+  const onSubmit = async (data: any) => {
+    setLoading(true)
+    setMessage("")
+    try {
+      const response = await fetch("/api/emergency-alerts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      })
+      const result = await response.json()
+      if (result.success) {
+        setMessage("Alert sent successfully!")
+        reset()
+      } else {
+        setMessage("Failed to send alert.")
+      }
+    } catch (error) {
+      setMessage("An error occurred.")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const onVolunteerSubmit = async (data: any) => {
+    setLoading(true)
+    setMessage("")
+    try {
+      const response = await fetch("/api/volunteer", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      })
+      const result = await response.json()
+      if (result.success) {
+        setMessage("Volunteer registered successfully!")
+        reset()
+      } else {
+        setMessage("Failed to register volunteer.")
+      }
+    } catch (error) {
+      setMessage("An error occurred.")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const onPostNeedSubmit = async (data: any) => {
+    setLoading(true)
+    setMessage("")
+    try {
+      const response = await fetch("/api/post-need", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      })
+      const result = await response.json()
+      if (result.success) {
+        setMessage("Volunteer need posted successfully!")
+        reset()
+      } else {
+        setMessage("Failed to post volunteer need.")
+      }
+    } catch (error) {
+      setMessage("An error occurred.")
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-red-50 to-red-100 dark:from-red-950 dark:to-red-900">
       <header className="bg-white dark:bg-gray-950 shadow-md">
@@ -102,103 +184,39 @@ export default function EmergencyPage() {
                     </p>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                      <h4 className="font-medium mb-2">Send Alerts</h4>
-                      <p className="text-sm mb-3">Report emergencies to notify your community.</p>
-                      <h5 className="font-medium text-sm mb-1">SMS Commands:</h5>
-                      <ul className="space-y-1 text-sm">
-                        <li>
-                          <span className="font-mono bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
-                            ALERT [TYPE] [LOCATION] [DETAILS]
-                          </span>
-                        </li>
-                        <li>
-                          <span className="font-mono bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
-                            UPDATE [ALERT-ID] [UPDATE]
-                          </span>
-                        </li>
-                        <li>
-                          <span className="font-mono bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
-                            RESOLVE [ALERT-ID]
-                          </span>
-                        </li>
-                      </ul>
-                      <h5 className="font-medium text-sm mt-3 mb-1">USSD:</h5>
-                      <p className="text-sm">
-                        Dial <span className="font-mono bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">*123#</span>,
-                        select option 5, then option 1
-                      </p>
-                    </div>
-
-                    <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                      <h4 className="font-medium mb-2">Receive Alerts</h4>
-                      <p className="text-sm mb-3">Subscribe to alerts in your area.</p>
-                      <h5 className="font-medium text-sm mb-1">SMS Commands:</h5>
-                      <ul className="space-y-1 text-sm">
-                        <li>
-                          <span className="font-mono bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
-                            SUBSCRIBE [LOCATION]
-                          </span>{" "}
-                          - Get alerts for an area
-                        </li>
-                        <li>
-                          <span className="font-mono bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
-                            UNSUBSCRIBE [LOCATION]
-                          </span>{" "}
-                          - Stop alerts for an area
-                        </li>
-                        <li>
-                          <span className="font-mono bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">VOICE ON</span> -
-                          Receive voice call alerts
-                        </li>
-                        <li>
-                          <span className="font-mono bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">VOICE OFF</span> -
-                          SMS alerts only
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-
-                  <div className="bg-yellow-50 dark:bg-yellow-900/30 p-4 rounded-lg">
-                    <h4 className="font-medium mb-2">Alert Categories</h4>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-                      <div className="bg-white dark:bg-gray-800 p-3 rounded text-center">
-                        <h5 className="font-medium">Medical</h5>
-                      </div>
-                      <div className="bg-white dark:bg-gray-800 p-3 rounded text-center">
-                        <h5 className="font-medium">Weather</h5>
-                      </div>
-                      <div className="bg-white dark:bg-gray-800 p-3 rounded text-center">
-                        <h5 className="font-medium">Security</h5>
-                      </div>
-                      <div className="bg-white dark:bg-gray-800 p-3 rounded text-center">
-                        <h5 className="font-medium">Infrastructure</h5>
-                      </div>
-                      <div className="bg-white dark:bg-gray-800 p-3 rounded text-center">
-                        <h5 className="font-medium">Disease Outbreak</h5>
-                      </div>
-                      <div className="bg-white dark:bg-gray-800 p-3 rounded text-center">
-                        <h5 className="font-medium">Missing Person</h5>
-                      </div>
-                      <div className="bg-white dark:bg-gray-800 p-3 rounded text-center">
-                        <h5 className="font-medium">Resource Shortage</h5>
-                      </div>
-                      <div className="bg-white dark:bg-gray-800 p-3 rounded text-center">
-                        <h5 className="font-medium">Other</h5>
+                  <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                        <h4 className="font-medium mb-2">Send Alerts</h4>
+                        <p className="text-sm mb-3">Report emergencies to notify your community.</p>
+                        <div className="space-y-2">
+                          <input
+                            type="text"
+                            placeholder="Type"
+                            {...register("type", { required: true })}
+                            className="w-full p-2 border border-gray-300 rounded"
+                          />
+                          <input
+                            type="text"
+                            placeholder="Location"
+                            {...register("location", { required: true })}
+                            className="w-full p-2 border border-gray-300 rounded"
+                          />
+                          <textarea
+                            placeholder="Details"
+                            {...register("details", { required: true })}
+                            className="w-full p-2 border border-gray-300 rounded"
+                          />
+                        </div>
                       </div>
                     </div>
-                  </div>
+                    <Button type="submit" className="w-full sm:w-auto" disabled={loading}>
+                      {loading ? "Sending..." : "Send Alert"}
+                    </Button>
+                  </form>
+                  {message && <p className="text-center mt-4">{message}</p>}
                 </div>
               </CardContent>
-              <CardFooter className="flex flex-col sm:flex-row justify-center gap-4">
-                <Button variant="destructive" className="w-full sm:w-auto">
-                  Report Emergency
-                </Button>
-                <Button variant="outline" className="w-full sm:w-auto">
-                  Subscribe to Alerts
-                </Button>
-              </CardFooter>
             </Card>
           </TabsContent>
 
@@ -224,102 +242,78 @@ export default function EmergencyPage() {
                     </p>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                      <h4 className="font-medium mb-2">For Volunteers</h4>
-                      <p className="text-sm mb-3">Register as a volunteer and get matched with opportunities.</p>
-                      <h5 className="font-medium text-sm mb-1">SMS Commands:</h5>
-                      <ul className="space-y-1 text-sm">
-                        <li>
-                          <span className="font-mono bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
-                            VOLUNTEER REGISTER [SKILLS]
-                          </span>
-                        </li>
-                        <li>
-                          <span className="font-mono bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
-                            VOLUNTEER LOCATION [AREA]
-                          </span>
-                        </li>
-                        <li>
-                          <span className="font-mono bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
-                            VOLUNTEER AVAILABILITY [TIMES]
-                          </span>
-                        </li>
-                        <li>
-                          <span className="font-mono bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
-                            VOLUNTEER STATUS
-                          </span>{" "}
-                          - Check your profile
-                        </li>
-                      </ul>
+                  <form onSubmit={handleSubmit(onVolunteerSubmit)} className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                        <h4 className="font-medium mb-2">Register as Volunteer</h4>
+                        <p className="text-sm mb-3">Sign up to offer your skills and assistance.</p>
+                        <div className="space-y-2">
+                          <input
+                            type="text"
+                            placeholder="Name"
+                            {...register("name", { required: true })}
+                            className="w-full p-2 border border-gray-300 rounded"
+                          />
+                          <input
+                            type="text"
+                            placeholder="Phone Number"
+                            {...register("phone", { required: true })}
+                            className="w-full p-2 border border-gray-300 rounded"
+                          />
+                          <input
+                            type="text"
+                            placeholder="Skills"
+                            {...register("skills", { required: true })}
+                            className="w-full p-2 border border-gray-300 rounded"
+                          />
+                        </div>
+                      </div>
                     </div>
+                    <Button type="submit" className="w-full sm:w-auto" disabled={loading}>
+                      {loading ? "Registering..." : "Register as Volunteer"}
+                    </Button>
+                  </form>
+                  {message && <p className="text-center mt-4">{message}</p>}
 
-                    <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                      <h4 className="font-medium mb-2">For Organizations</h4>
-                      <p className="text-sm mb-3">Post volunteer opportunities and find help.</p>
-                      <h5 className="font-medium text-sm mb-1">SMS Commands:</h5>
-                      <ul className="space-y-1 text-sm">
-                        <li>
-                          <span className="font-mono bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
-                            ORG REGISTER [NAME]
-                          </span>
-                        </li>
-                        <li>
-                          <span className="font-mono bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
-                            ORG POST [NEED] [LOCATION] [DETAILS]
-                          </span>
-                        </li>
-                        <li>
-                          <span className="font-mono bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
-                            ORG UPDATE [POST-ID] [UPDATE]
-                          </span>
-                        </li>
-                        <li>
-                          <span className="font-mono bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
-                            ORG CLOSE [POST-ID]
-                          </span>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-
-                  <div className="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-lg">
-                    <h4 className="font-medium mb-2">Volunteer Categories</h4>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
-                      <div className="bg-white dark:bg-gray-800 p-3 rounded">
-                        <h5 className="font-medium mb-1">Medical Assistance</h5>
-                        <p className="text-xs">Healthcare professionals, first aid</p>
-                      </div>
-                      <div className="bg-white dark:bg-gray-800 p-3 rounded">
-                        <h5 className="font-medium mb-1">Logistics & Transport</h5>
-                        <p className="text-xs">Drivers, delivery, coordination</p>
-                      </div>
-                      <div className="bg-white dark:bg-gray-800 p-3 rounded">
-                        <h5 className="font-medium mb-1">Community Outreach</h5>
-                        <p className="text-xs">Information sharing, education</p>
-                      </div>
-                      <div className="bg-white dark:bg-gray-800 p-3 rounded">
-                        <h5 className="font-medium mb-1">Resource Distribution</h5>
-                        <p className="text-xs">Food, supplies, medications</p>
-                      </div>
-                      <div className="bg-white dark:bg-gray-800 p-3 rounded">
-                        <h5 className="font-medium mb-1">Technical Support</h5>
-                        <p className="text-xs">IT, communications, repairs</p>
-                      </div>
-                      <div className="bg-white dark:bg-gray-800 p-3 rounded">
-                        <h5 className="font-medium mb-1">Emotional Support</h5>
-                        <p className="text-xs">Counseling, check-ins, companionship</p>
+                  <form onSubmit={handleSubmit(onPostNeedSubmit)} className="space-y-6 mt-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                        <h4 className="font-medium mb-2">Post Volunteer Need</h4>
+                        <p className="text-sm mb-3">Request assistance from volunteers.</p>
+                        <div className="space-y-2">
+                          <input
+                            type="text"
+                            placeholder="Organization Name"
+                            {...register("organization", { required: true })}
+                            className="w-full p-2 border border-gray-300 rounded"
+                          />
+                          <input
+                            type="text"
+                            placeholder="Need"
+                            {...register("need", { required: true })}
+                            className="w-full p-2 border border-gray-300 rounded"
+                          />
+                          <input
+                            type="text"
+                            placeholder="Location"
+                            {...register("location", { required: true })}
+                            className="w-full p-2 border border-gray-300 rounded"
+                          />
+                          <textarea
+                            placeholder="Details"
+                            {...register("details", { required: true })}
+                            className="w-full p-2 border border-gray-300 rounded"
+                          />
+                        </div>
                       </div>
                     </div>
-                  </div>
+                    <Button type="submit" className="w-full sm:w-auto" disabled={loading}>
+                      {loading ? "Posting..." : "Post Volunteer Need"}
+                    </Button>
+                  </form>
+                  {message && <p className="text-center mt-4">{message}</p>}
                 </div>
               </CardContent>
-              <CardFooter className="flex flex-col sm:flex-row justify-center gap-4">
-                <Button className="w-full sm:w-auto">Register as Volunteer</Button>
-                <Button variant="outline" className="w-full sm:w-auto">
-                  Post Volunteer Need
-                </Button>
-              </CardFooter>
             </Card>
           </TabsContent>
         </Tabs>
@@ -333,4 +327,3 @@ export default function EmergencyPage() {
     </div>
   )
 }
-
