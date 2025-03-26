@@ -10,6 +10,7 @@ import { Calendar as CalendarComponent } from "@/components/ui/calendar"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
+import { InlineWidget } from "react-calendly"
 
 type Facility = {
   id: string

@@ -1,3 +1,4 @@
+import { NextResponse } from "next/server"
 import africastalking from "africastalking"
 
 // Initialize the SDK with your credentials

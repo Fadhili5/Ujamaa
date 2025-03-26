@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { PhoneCall, Users, MessageSquare, Shield } from "lucide-react"
+import { JaaSMeeting } from "@/components/mental-health/JaaSMeeting"
 
 export default function MentalHealthPage() {
   const { register, handleSubmit, reset } = useForm()
@@ -188,6 +189,27 @@ export default function MentalHealthPage() {
                         access to your phone number or personal information unless you choose to share it.
                       </p>
                     </div>
+                  </div>
+
+                  <div className="mt-6">
+                    <JaaSMeeting
+                      appId="vpaas-magic-cookie-e4cf906708564344b7de31914d78c35e"
+                      roomName="PleaseUseAGoodRoomName"
+                      jwt="eyJraWQiOiJ2cGFhcy1tYWdpYy1jb29raWUtZTRjZjkwNjcwODU2NDM0NGI3ZGUzMTkxNGQ3OGMzNWUvY2NjY2E5LVNBTVBMRV9BUFAiLCJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiJqaXRzaSIsImlzcyI6ImNoYXQiLCJpYXQiOjE3NDI5OTU2NTUsImV4cCI6MTc0MzAwMjg1NSwibmJmIjoxNzQyOTk1NjUwLCJzdWIiOiJ2cGFhcy1tYWdpYy1jb29raWUtZTRjZjkwNjcwODU2NDM0NGI3ZGUzMTkxNGQ3OGMzNWUiLCJjb250ZXh0Ijp7ImZlYXR1cmVzIjp7ImxpdmVzdHJlYW1pbmciOnRydWUsIm91dGJvdW5kLWNhbGwiOnRydWUsInNpcC1vdXRib3VuZC1jYWxsIjpmYWxzZSwidHJhbnNjcmlwdGlvbiI6dHJ1ZSwicmVjb3JkaW5nIjp0cnVlfSwidXNlciI6eyJoaWRkZW4tZnJvbS1yZWNvcmRlciI6ZmFsc2UsIm1vZGVyYXRvciI6dHJ1ZSwibmFtZSI6ImRlbmlzZmFkaGlsaTUiLCJpZCI6Imdvb2dsZS1vYXV0aDJ8MTA3NDg0MjgwMDAxMjM1ODI4NTM0IiwiYXZhdGFyIjoiIiwiZW1haWwiOiJkZW5pc2ZhZGhpbGk1QGdtYWlsLmNvbSJ9fSwicm9vbSI6IioifQ.fnZfgsJdgCucn_wACiex0BlyG20vCJ2Y1NCw0koO8LzztgL5DHDN2Wypph72CFTSFCLbplIS4P786AfFTS4U1Dg-ri2C3OM0glVo2WPdqz2xa6Me9HJnDbbJjVnW8ddPfBjDwy8smnMZeJ54j2EmGLKRFlWtp2lIEzZ5a5MsOehNPok_HrhFv5WQqf6QjoVkdUyTYnOmYtXX2xCcOmpun21_D47UZlkCezQXcAzI4HEnEZCk_SXZZ1oYHN7tiGWOR3RkzBMqDlHS1uFbamBijnpnqQsS9G0snuruPeIaCItR1SOFRyzcCj9ce4I_fkl-W_kpJVVx0vj_v3zKWpzpCQ"
+                      configOverwrite={{
+                        disableLocalVideoFlip: true,
+                        backgroundAlpha: 0.5,
+                      }}
+                      interfaceConfigOverwrite={{
+                        VIDEO_LAYOUT_FIT: "nocrop",
+                        MOBILE_APP_PROMO: false,
+                        TILE_VIEW_MAX_COLUMNS: 4,
+                      }}
+                      spinner={<div>Loading...</div>}
+                      onApiReady={(externalApi) => {
+                        console.log("JitsiMeetExternalAPI is ready", externalApi)
+                      }}
+                    />
                   </div>
                 </div>
               </CardContent>

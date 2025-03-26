@@ -18,17 +18,21 @@ const smsService = africasTalking.SMS
 export async function POST(request: Request) {
   try {
     const data = await request.json()
-    const { type, location, details } = data
+    const { phoneNumber, type, location, details } = data
+
+    console.log("Received data:", data)
 
     // Construct the message
     const message = `Emergency Alert: ${type}\nLocation: ${location}\nDetails: ${details}`
 
     // Send the SMS
     const response = await smsService.send({
-      to: ["+254707548787"], // Replace with the recipient's phone number
+      to: [phoneNumber], // Use the phone number provided by the user
       message,
-      from: "20880",
+      from: "AFTKNG", // Use a valid sender ID
     })
+
+    console.log("SMS Response:", response)
 
     return NextResponse.json({
       success: true,

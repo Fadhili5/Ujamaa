@@ -157,9 +157,10 @@ export default function EmergencyPage() {
         </div>
 
         <Tabs defaultValue="alerts" className="w-full max-w-4xl mx-auto">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="alerts">Send & Receive Alerts</TabsTrigger>
             <TabsTrigger value="volunteer">Volunteer Connection</TabsTrigger>
+            <TabsTrigger value="map">Emergency Map</TabsTrigger>
           </TabsList>
 
           <TabsContent value="alerts" className="mt-6">
@@ -190,6 +191,12 @@ export default function EmergencyPage() {
                         <h4 className="font-medium mb-2">Send Alerts</h4>
                         <p className="text-sm mb-3">Report emergencies to notify your community.</p>
                         <div className="space-y-2">
+                          <input
+                            type="text"
+                            placeholder="Phone Number"
+                            {...register("phoneNumber", { required: true })}
+                            className="w-full p-2 border border-gray-300 rounded"
+                          />
                           <input
                             type="text"
                             placeholder="Type"
@@ -312,6 +319,30 @@ export default function EmergencyPage() {
                     </Button>
                   </form>
                   {message && <p className="text-center mt-4">{message}</p>}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="map" className="mt-6">
+            <Card>
+              <CardHeader>
+                <div className="flex justify-center mb-4">
+                  <AlertTriangle className="h-12 w-12 text-red-600" />
+                </div>
+                <CardTitle className="text-center text-2xl">Emergency Map</CardTitle>
+                <CardDescription className="text-center text-lg">
+                  View emergency locations and resources on the map
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="aspect-w-16 aspect-h-9 h-[600px]">
+                  <iframe
+                    src="https://gengeo.maps.arcgis.com/apps/mapviewer/index.html?webmap=079628c4a33f45f68e3eef5328dc5254"
+                    frameBorder="0"
+                    allowFullScreen
+                    className="w-full h-full"
+                  ></iframe>
                 </div>
               </CardContent>
             </Card>
