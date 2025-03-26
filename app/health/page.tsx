@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { HealthReminder } from "@/components/health/health-reminder"
 import { PersonalizedTips } from "@/components/health/personalized-tips"
 import { AppointmentBooking } from "@/components/health/appointment-booking"
-import { VoiceConsultation } from "@/components/health/voice-consultation"
+import { VoiceConsultation } from "@/components/health/VoiceConsultation"
 
 export default function HealthPage() {
   const [activeTab, setActiveTab] = useState("tips")

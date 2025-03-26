@@ -1,3 +1,6 @@
+"use client"
+import { useState, useEffect } from "react"
+import { useForm } from "react-hook-form"
 import { Header } from "@/components/ui/header"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -6,6 +9,77 @@ import ResourceMap from "@/components/resource-map"
 import { Button } from "@/components/ui/button"
 
 export default function ResourcesPage() {
+  const { register, handleSubmit, reset } = useForm()
+  const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState("")
+  const [resources, setResources] = useState([])
+
+  const fetchResources = async () => {
+    try {
+      const response = await fetch("/api/resources")
+      const data = await response.json()
+      setResources(data.resources)
+    } catch (error) {
+      console.error("Error fetching resources:", error)
+    }
+  }
+
+  useEffect(() => {
+    fetchResources()
+  }, [])
+
+  const onRequestResource = async (data: any) => {
+    setLoading(true)
+    setMessage("")
+    try {
+      const response = await fetch("/api/request-resource", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      })
+      const result = await response.json()
+      if (result.success) {
+        setMessage("Resource request submitted successfully!")
+        reset()
+        fetchResources()
+      } else {
+        setMessage("Failed to submit resource request.")
+      }
+    } catch (error) {
+      setMessage("An error occurred.")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const onOfferResource = async (data: any) => {
+    setLoading(true)
+    setMessage("")
+    try {
+      const response = await fetch("/api/offer-resource", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      })
+      const result = await response.json()
+      if (result.success) {
+        setMessage("Resource offer submitted successfully!")
+        reset()
+        fetchResources()
+      } else {
+        setMessage("Failed to submit resource offer.")
+      }
+    } catch (error) {
+      setMessage("An error occurred.")
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
@@ -167,21 +241,23 @@ export default function ResourcesPage() {
                       <p className="text-sm mb-3 text-gray-300">
                         Need something? Submit a request and get matched with available resources.
                       </p>
-                      <h5 className="font-medium text-sm mb-1 text-white">SMS Commands:</h5>
-                      <ul className="space-y-1 text-sm text-gray-300">
-                        <li>
-                          <span className="font-mono bg-gray-700 px-2 py-1 rounded">NEED [RESOURCE] [LOCATION]</span> -
-                          Request a resource
-                        </li>
-                        <li>
-                          <span className="font-mono bg-gray-700 px-2 py-1 rounded">CHECK REQUEST</span> - Check status
-                          of your request
-                        </li>
-                        <li>
-                          <span className="font-mono bg-gray-700 px-2 py-1 rounded">CANCEL REQUEST</span> - Cancel your
-                          request
-                        </li>
-                      </ul>
+                      <form onSubmit={handleSubmit(onRequestResource)} className="space-y-4">
+                        <input
+                          type="text"
+                          placeholder="Resource"
+                          {...register("resource", { required: true })}
+                          className="w-full p-2 border border-gray-300 rounded"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Location"
+                          {...register("location", { required: true })}
+                          className="w-full p-2 border border-gray-300 rounded"
+                        />
+                        <Button type="submit" className="w-full sm:w-auto" disabled={loading}>
+                          {loading ? "Requesting..." : "Request Resource"}
+                        </Button>
+                      </form>
                     </div>
 
                     <div className="border border-gray-700 rounded-lg p-4">
@@ -189,51 +265,36 @@ export default function ResourcesPage() {
                       <p className="text-sm mb-3 text-gray-300">
                         Have something to share? Let others know what you can offer.
                       </p>
-                      <h5 className="font-medium text-sm mb-1 text-white">SMS Commands:</h5>
-                      <ul className="space-y-1 text-sm text-gray-300">
-                        <li>
-                          <span className="font-mono bg-gray-700 px-2 py-1 rounded">OFFER [RESOURCE] [LOCATION]</span> -
-                          Offer a resource
-                        </li>
-                        <li>
-                          <span className="font-mono bg-gray-700 px-2 py-1 rounded">CHECK OFFER</span> - Check status of
-                          your offer
-                        </li>
-                        <li>
-                          <span className="font-mono bg-gray-700 px-2 py-1 rounded">CANCEL OFFER</span> - Cancel your
-                          offer
-                        </li>
-                      </ul>
+                      <form onSubmit={handleSubmit(onOfferResource)} className="space-y-4">
+                        <input
+                          type="text"
+                          placeholder="Resource"
+                          {...register("resource", { required: true })}
+                          className="w-full p-2 border border-gray-300 rounded"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Location"
+                          {...register("location", { required: true })}
+                          className="w-full p-2 border border-gray-300 rounded"
+                        />
+                        <Button type="submit" className="w-full sm:w-auto" disabled={loading}>
+                          {loading ? "Offering..." : "Offer Resource"}
+                        </Button>
+                      </form>
                     </div>
                   </div>
 
                   <div className="bg-gray-700/50 p-4 rounded-lg">
-                    <h4 className="font-medium mb-2 text-white">Resource Categories</h4>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
-                      <div className="bg-gray-800 p-3 rounded">
-                        <h5 className="font-medium mb-1 text-white">Medical Supplies</h5>
-                        <p className="text-xs text-gray-400">Medications, first aid, mobility aids</p>
-                      </div>
-                      <div className="bg-gray-800 p-3 rounded">
-                        <h5 className="font-medium mb-1 text-white">Food & Nutrition</h5>
-                        <p className="text-xs text-gray-400">Food donations, meal services</p>
-                      </div>
-                      <div className="bg-gray-800 p-3 rounded">
-                        <h5 className="font-medium mb-1 text-white">Transportation</h5>
-                        <p className="text-xs text-gray-400">Rides to appointments, deliveries</p>
-                      </div>
-                      <div className="bg-gray-800 p-3 rounded">
-                        <h5 className="font-medium mb-1 text-white">Childcare</h5>
-                        <p className="text-xs text-gray-400">Babysitting, school supplies</p>
-                      </div>
-                      <div className="bg-gray-800 p-3 rounded">
-                        <h5 className="font-medium mb-1 text-white">Education</h5>
-                        <p className="text-xs text-gray-400">Tutoring, books, school fees</p>
-                      </div>
-                      <div className="bg-gray-800 p-3 rounded">
-                        <h5 className="font-medium mb-1 text-white">Skills & Services</h5>
-                        <p className="text-xs text-gray-400">Professional services, repairs</p>
-                      </div>
+                    <h4 className="font-medium mb-2 text-white">Available Resources</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {resources.map((resource, index) => (
+                        <div key={index} className="border border-gray-700 rounded-lg p-4">
+                          <h5 className="font-medium text-white">{resource.resource}</h5>
+                          <p className="text-sm text-gray-300">{resource.location}</p>
+                          <p className="text-xs text-gray-400">{resource.details}</p>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>
